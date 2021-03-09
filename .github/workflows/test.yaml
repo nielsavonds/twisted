@@ -20,16 +20,18 @@ jobs:
   testing:
     runs-on: ubuntu-20.04
     env:
-      TOXENV: "${{ matrix.tox-env }}-withcov-posix,coverage-prepare,codecov-push,coveralls-push"
-    name: ${{ matrix.python-version }}${{ matrix.noipv6 }}-${{ matrix.tox-env }}-withcov-posix
+      TOXENV: "${{ matrix.tox-env }},${{ matrix.coverage-env }}"
+      CODECOV_OPTIONS: "-n 'linux-${{ matrix.python-version }}-${{ matrix.tox-env }}'"
+    name: ${{ matrix.python-version }}${{ matrix.noipv6 }}-${{ matrix.tox-env }}
     strategy:
       matrix:
         # Run on the minimum micro Python version that we can get on CI.
         # When updating the minimum Python version here, also update the
         # `python_requires` from `setup.cfg`.
         # Run on latest minor release of each major python version.
-        python-version: [3.6, 3.7, 3.8, 3.9, 3.10.0-alpha.5, pypy-3.6, pypy-3.7]
-        tox-env: [alldeps]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10.0-alpha.5]
+        tox-env: ['alldeps-withcov-posix']
+        coverage-env: ['coverage-prepare,codecov-push,coveralls-push']
         noipv6: ['']
 
         include:
@@ -39,13 +41,24 @@ jobs:
           # The minimum supported Python version should be used to maximize
           # coverage of code that otherwise depends on backports.
           - python-version: 3.6.7
-            tox-env: nodeps
+            tox-env: nodeps-withcov-posix
           # `noipv6` is created to make sure all is OK on an OS which doesn't
           # have IPv6 available.
           # Any supported Python version is OK for this job.
           - python-version: 3.6
-            tox-env: alldeps
+            tox-env: alldeps-withcov-posix
             noipv6: -noipv6
+
+          # Coverage on PyPy was temporary disabled to investigate random
+          # failures.
+          # See: https://twistedmatrix.com/trac/ticket/10121
+          - python-version: pypy-3.6
+            tox-env: alldeps-nocov-posix
+            coverage-env:
+          - python-version: pypy-3.7
+            tox-env: alldeps-nocov-posix
+            coverage-env:
+
 
     steps:
     - uses: actions/checkout@v2
