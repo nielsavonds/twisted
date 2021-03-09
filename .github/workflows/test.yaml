@@ -22,9 +22,10 @@ jobs:
     env:
       TOXENV: "${{ matrix.tox-env }}"
       CODECOV_OPTIONS: "-n 'linux-${{ matrix.python-version }}-${{ matrix.tox-env }}'"
-      TRIAL_JOBS: '-j 2'
+      TRIAL_JOBS: '2'
     name: ${{ matrix.python-version }}${{ matrix.noipv6 }}-${{ matrix.tox-env }}
     strategy:
+      fail-fast: false
       matrix:
         # Run on the minimum micro Python version that we can get on CI.
         # When updating the minimum Python version here, also update the
