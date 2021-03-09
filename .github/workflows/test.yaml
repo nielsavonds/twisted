@@ -20,7 +20,7 @@ jobs:
   testing:
     runs-on: ubuntu-20.04
     env:
-      TOXENV: "${{ matrix.tox-env }},${{ matrix.coverage-env }}"
+      TOXENV: "${{ matrix.tox-env }}"
       CODECOV_OPTIONS: "-n 'linux-${{ matrix.python-version }}-${{ matrix.tox-env }}'"
     name: ${{ matrix.python-version }}${{ matrix.noipv6 }}-${{ matrix.tox-env }}
     strategy:
@@ -31,7 +31,6 @@ jobs:
         # Run on latest minor release of each major python version.
         python-version: [3.6, 3.7, 3.8, 3.9, 3.10.0-alpha.5]
         tox-env: ['alldeps-withcov-posix']
-        coverage-env: ['coverage-prepare,codecov-push,coveralls-push']
         noipv6: ['']
 
         include:
@@ -54,11 +53,8 @@ jobs:
           # See: https://twistedmatrix.com/trac/ticket/10121
           - python-version: pypy-3.6
             tox-env: alldeps-nocov-posix
-            coverage-env:
           - python-version: pypy-3.7
             tox-env: alldeps-nocov-posix
-            coverage-env:
-
 
     steps:
     - uses: actions/checkout@v2
@@ -102,6 +98,9 @@ jobs:
         python --version
         tox -q
 
+    - name: Publish coverage
+      if: contains(matrix['tox-env'], 'withcov')
+      run: tox -e coverage-prepare,codecov-push,coveralls-push
 
   pypi-publish:
     # https://github.community/t/is-it-possible-to-require-all-github-actions-tasks-to-pass-without-enumerating-them/117957/4?u=graingert
