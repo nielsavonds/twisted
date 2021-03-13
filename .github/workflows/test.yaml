@@ -22,7 +22,6 @@ jobs:
     env:
       TOXENV: "${{ matrix.tox-env }}"
       CODECOV_OPTIONS: "-n 'linux-${{ matrix.python-version }}-${{ matrix.tox-env }}'"
-      TRIAL_JOBS: '2'
     name: ${{ matrix.python-version }}${{ matrix.noipv6 }}-${{ matrix.tox-env }}
     strategy:
       fail-fast: false
@@ -101,7 +100,7 @@ jobs:
         tox -q
 
     - name: Publish coverage
-      if: contains(matrix['tox-env'], 'withcov')
+      if: contains(matrix['tox-env'], 'withcov') || failure()
       run: tox -e coverage-prepare,codecov-push,coveralls-push
 
   pypi-publish:
