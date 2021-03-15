@@ -53,9 +53,9 @@ jobs:
           # failures.
           # See: https://twistedmatrix.com/trac/ticket/10121
           - python-version: pypy-3.6
-            tox-env: alldeps-nocov-posix
+            tox-env: alldeps-withcov-posix
           - python-version: pypy-3.7
-            tox-env: alldeps-nocov-posix
+            tox-env: alldeps-withcov-posix
 
     steps:
     - uses: actions/checkout@v2
